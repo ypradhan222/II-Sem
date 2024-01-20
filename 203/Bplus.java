@@ -26,115 +26,131 @@ public class Bplus {
     static Node root;
     static int degree = 3;
     static final int KEY_LENGTH = 25;
+    
+ private static void insertData(Node node, String key, long fileOffset) {
+    int index = node.size - 1;
 
-    private static void insertData(Node node, String key, long fileOffset) {
-        int index = node.size - 1;
+    while (index >= 0 && key.compareTo(node.keys[index]) < 0) {
+        node.keys[index + 1] = node.keys[index];
+        node.fileOffsets[index + 1] = node.fileOffsets[index];
 
-        while (index >= 0 && key.compareTo(node.keys[index]) < 0) {
-            node.keys[index + 1] = node.keys[index];
-            node.fileOffsets[index + 1] = node.fileOffsets[index];
-            if (!node.leaf) {
+        if (!node.leaf) {
+            // Shift child references to the right
+            if (index + 1 < node.children.length) {
                 node.children[index + 2] = node.children[index + 1];
             }
-            index--;
         }
 
-        // Increment the index before using it to insert the new data
-        index++;
+        index--;
+    }
 
-        node.keys[index] = key;
-        node.fileOffsets[index] = fileOffset;
-        if (!node.leaf) {
+    // Increment the index before using it to insert the new data
+    index++;
+
+    node.keys[index] = key;
+    node.fileOffsets[index] = fileOffset;
+
+    if (!node.leaf) {
+        // Adjust child references
+        if (index + 1 < node.children.length) {
             node.children[index + 1] = null; // Set the new child reference to null
         }
-        node.size++;
     }
 
-    private static void splitNode(Node parentNode, int childIndex) {
-        Node childNode = parentNode.children[childIndex];
-        Node newNode = new Node(degree, childNode.leaf);
+    node.size++;
+}
 
-        int mid = childNode.size / 2;
+private static void splitNode(Node parentNode, int childIndex) {
+    Node childNode = parentNode.children[childIndex];
+    Node newNode = new Node(degree, childNode.leaf);
 
-        for (int i = mid + 1; i < childNode.size; i++) {
-            newNode.keys[i - mid - 1] = childNode.keys[i];
-            newNode.fileOffsets[i - mid - 1] = childNode.fileOffsets[i];
-            newNode.children[i - mid - 1] = childNode.children[i];
-            childNode.size--;
-            newNode.size++;
-        }
+    int mid = childNode.size / 2;
 
-        newNode.children[newNode.size] = childNode.children[childNode.size];
-        childNode.size--;
-
-        insertData(parentNode, childNode.keys[mid], 0);
-        insertData(parentNode, newNode.keys[0], 0);
-
-        parentNode.children[childIndex] = newNode;
-        newNode.parent = parentNode;
+    for (int i = mid; i < childNode.size; i++) {
+        newNode.keys[i - mid] = childNode.keys[i];
+        newNode.fileOffsets[i - mid] = childNode.fileOffsets[i];
+        newNode.children[i - mid] = childNode.children[i];
+        childNode.children[i] = null; // Set child references to null in the original node
     }
 
-    public static void add(String key, long fileOffset) {
-        System.out.println("\nInserting Key: " + key + ", File Offset: " + fileOffset);
+    newNode.size = childNode.size - mid;
+    childNode.size = mid;
 
-        if (root == null) {
-            Node leafNode = new Node(degree, true);
-            insertData(leafNode, key, fileOffset);
-            root = leafNode;
-            return;
+    newNode.children[newNode.size] = childNode.children[childNode.size];
+    childNode.children[childNode.size] = null; // Set the last child reference to null in the original node
+
+    // Insert the median key into the parent node
+    insertData(parentNode, childNode.keys[childNode.size - 1], childNode.fileOffsets[childNode.size - 1]);
+
+    // Insert the first key of the new node into the parent node
+    insertData(parentNode, newNode.keys[0], newNode.fileOffsets[0]);
+
+    parentNode.children[childIndex] = newNode;
+    newNode.parent = parentNode;
+}
+
+  
+private static void add(String key, long fileOffset) {
+    System.out.println("\nInserting Key: " + key + ", File Offset: " + fileOffset);
+
+    if (root == null) {
+        Node leafNode = new Node(degree, true);
+        insertData(leafNode, key, fileOffset);
+        root = leafNode;
+        return;
+    }
+
+    Node currentNode = root;
+    Node parent = null;
+    int childIndex = -1;
+
+    while (true) {
+        if (currentNode.leaf || currentNode.size < 2 * degree - 1) {
+            insertData(currentNode, key, fileOffset);
+            break;
         }
 
-        Node currentNode = root;
-        Node parent = null;
-        int childIndex = -1;
+        parent = currentNode;
+        childIndex = 0;
 
-        while (true) {
-            if (currentNode.leaf || currentNode.size < 2 * degree - 1) {
-                insertData(currentNode, key, fileOffset);
-                break;
+        while (childIndex < currentNode.size && key.compareTo(currentNode.keys[childIndex]) > 0) {
+            childIndex++;
+        }
+
+        Node nextNode = currentNode.children[childIndex];
+
+        if (nextNode.size == 2 * degree - 1) {
+            splitNode(currentNode, childIndex);
+            if (key.compareTo(currentNode.keys[childIndex]) > 0) {
+                nextNode = currentNode.children[childIndex + 1];
             }
+        }
 
-            parent = currentNode;
-            childIndex = 0;
+        currentNode = nextNode;
+    }
 
-            while (childIndex < currentNode.size && key.compareTo(currentNode.keys[childIndex]) > 0) {
-                childIndex++;
-            }
-
-            Node nextNode = currentNode.children[childIndex];
-
-            if (nextNode.size == 2 * degree - 1) {
-                splitNode(currentNode, childIndex);
-                if (key.compareTo(currentNode.keys[childIndex]) > 0) {
-                    nextNode = currentNode.children[childIndex + 1];
+    if (parent != null) {
+        while (parent != null) {
+            if (currentNode.size == 2 * degree - 1) {
+                int index = 0;
+                while (index < parent.size && currentNode.keys[0].compareTo(parent.keys[index]) > 0) {
+                    index++;
                 }
-            }
 
-            currentNode = nextNode;
-        }
+                splitNode(parent, index);
 
-        if (parent != null) {
-            while (parent != null) {
-                if (currentNode.size == 2 * degree - 1) {
-                    int index = 0;
-                    while (index < parent.size && currentNode.keys[0].compareTo(parent.keys[index]) > 0) {
-                        index++;
-                    }
+                currentNode = parent;
+                parent = currentNode.parent;
 
-                    splitNode(parent, index);
-
-                    currentNode = parent;
-                    parent = currentNode.parent;
-
-                    if (parent == null) {
-                        break;
-                    }
-                } else {
+                if (parent == null) {
                     break;
                 }
+            } else {
+                break;
             }
         }
     }
+}
 
     public static void display(Node node, int level) {
         if (node == null) {
@@ -170,9 +186,9 @@ public class Bplus {
 
             while ((line = reader.readLine()) != null) {
                 if (!line.isEmpty()) {
-                    int key;
+                    String key;
                     try {
-                        key = Integer.parseInt(line.trim());
+                        key = line;
                         add(formatKey(String.valueOf(key)), fileOffset);
                         fileOffset += line.length() + 1; // +1 for newline character
                     } catch (NumberFormatException e) {
@@ -181,7 +197,7 @@ public class Bplus {
                 }
             }
 
-            display(root, 1);
+            display(root, 2);
         } catch (IOException e) {
             e.printStackTrace();
         }
