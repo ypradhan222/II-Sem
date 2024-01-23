@@ -1,0 +1,19 @@
+[2024-01-21 12:05:54] Open: newlog
+[2024-01-21 12:06:00] Write: Written Successfully
+[2024-01-21 12:06:05] Write: Written Successfully
+[2024-01-21 12:06:09] Write: Written Successfully
+[2024-01-21 12:06:20] Write: Written Successfully
+[2024-01-21 12:06:29] Read: Read Successfully
+[2024-01-21 12:06:29] Close: newlog
+[2024-01-21 12:35:15] Open: newlog2
+[2024-01-21 12:35:19] Write: Written Successfully
+[2024-01-21 12:35:22] Write: Written Successfully
+[2024-01-21 12:35:26] Write: Written Successfully
+[2024-01-21 12:35:43] Write: Written Successfully
+[2024-01-21 12:35:43] Close: newlog2
+[2024-01-21 14:06:40] Open: newlog3
+[2024-01-21 14:06:55] Write: Written Successfully
+[2024-01-21 14:07:15] Write: Written Successfully
+[2024-01-21 14:07:31] Write: Written Successfully
+[2024-01-21 14:07:45] Read: Read Successfully
+[2024-01-21 14:07:45] Close: newlog3

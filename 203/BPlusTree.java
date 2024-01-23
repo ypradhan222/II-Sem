@@ -2,7 +2,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.BufferedReader;
 public class BPlusTree {
 
     private Node root;
@@ -22,7 +24,7 @@ public class BPlusTree {
         }
     }
 
-    private Node insert(double key, String value, Node node) {
+    public Node insert(double key, String value, Node node) {
         if (node.isLeaf()) {
             LeafNode leaf = (LeafNode) node;
             leaf.addKey(key, value);
@@ -49,7 +51,7 @@ public class BPlusTree {
         return node;
     }
 
-    private Node splitInternal(InternalNode node) {
+    public Node splitInternal(InternalNode node) {
         InternalNode newNode = new InternalNode();
 
         int midIndex = node.getKeyCount() / 2;
@@ -73,7 +75,7 @@ public class BPlusTree {
         return parent;
     }
 
-    private LeafNode splitLeaf(LeafNode leaf) {
+    public LeafNode splitLeaf(LeafNode leaf) {
         LeafNode newLeaf = new LeafNode();
 
         int midIndex = leaf.getKeyCount() / 2;
@@ -91,7 +93,7 @@ public class BPlusTree {
         return result;
     }
 
-    private void search(double key, Node node, List<String> result) {
+    public void search(double key, Node node, List<String> result) {
         if (node.isLeaf()) {
             LeafNode leaf = (LeafNode) node;
             result.addAll(leaf.getValuesForKey(key));
@@ -102,7 +104,7 @@ public class BPlusTree {
         }
     }
 
-    private abstract class Node {
+    public abstract class Node {
         List<Double> keys;
         Node parent;
 
@@ -111,9 +113,10 @@ public class BPlusTree {
         }
 
         abstract boolean isLeaf();
-
+        abstract boolean isOverflow();
         abstract int getKeyCount();
-
+        abstract Node getParent();
+        abstract double removeKey(int index);
         abstract double getFirstKey();
 
         abstract List<Node> getChildren();
@@ -129,7 +132,7 @@ public class BPlusTree {
         abstract List<Node> removeChildren(int startIndex);
     }
 
-    private class InternalNode extends Node {
+    public class InternalNode extends Node {
         List<Node> children;
 
         InternalNode() {
@@ -139,6 +142,9 @@ public class BPlusTree {
         @Override
         boolean isLeaf() {
             return false;
+        }
+        Node getParent(){
+            return parent;
         }
 
         @Override
@@ -154,6 +160,9 @@ public class BPlusTree {
         @Override
         List<Node> getChildren() {
             return children;
+        }
+        double removeKey(int index){
+            return keys.remove(index);
         }
 
         @Override
@@ -193,13 +202,12 @@ public class BPlusTree {
             }
             return index;
         }
-
         boolean isOverflow() {
             return getKeyCount() > degree - 1;
         }
     }
 
-    private class LeafNode extends Node {
+    public class LeafNode extends Node {
         List<String> values;
         LeafNode next;
 
@@ -211,6 +219,15 @@ public class BPlusTree {
         @Override
         boolean isLeaf() {
             return true;
+        }
+        boolean isOverflow(){
+            return getKeyCount()>degree-1;
+        }
+        LeafNode getNext(){
+            return next;
+        }
+        void setNext(){
+            this.next = next;
         }
 
         @Override
@@ -243,7 +260,17 @@ public class BPlusTree {
             keys.add(key);
             values.add(value);
         }
+         @Override
+         List<Double> addKeys(List<Double> keys) {
+             this.keys.addAll(keys);
+             return this.keys;
+        }
 
+         @Override
+         List<Node> addChildren(List<Node> children) {
+        // LeafNode does not have children, so you can leave this empty
+            return Collections.emptyList();
+    }
         @Override
         List<Double> removeKeys(int startIndex) {
             List<Double> removedKeys = new ArrayList<>(keys.subList(startIndex, keys.size()));
@@ -294,24 +321,37 @@ public class BPlusTree {
             }
         }
     }
-
     public static void main(String[] args) {
+        // Check if a file name is provided as a command-line argument
+        if (args.length != 1) {
+            System.out.println("Usage: java BPlusTreeMain <filename>");
+            return;
+        }
+
+        String fileName = args[0];
+
+        // Create a B+ tree with a degree of 3
         BPlusTree bPlusTree = new BPlusTree(3);
 
-        bPlusTree.insert(1.1, "One");
-        bPlusTree.insert(2.2, "Two");
-        bPlusTree.insert(3.3, "Three");
-        bPlusTree.insert(4.4, "Four");
-        bPlusTree.insert(5.5, "Five");
-        bPlusTree.insert(6.6, "Six");
-        bPlusTree.insert(7.7, "Seven");
-        bPlusTree.insert(8.8, "Eight");
-        bPlusTree.insert(9.9, "Nine");
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Assuming each line in the file is a string to be indexed
+                bPlusTree.insert(line.hashCode(), line);
+            }
 
-        bPlusTree.printTree();
+            // Print the B+ tree after indexing
+            System.out.println("B+ Tree after indexing strings from the file:");
+            bPlusTree.printTree();
 
-        System.out.println("\nSearch results for key 4.4: " + bPlusTree.search(4.4));
-        System.out.println("Search results for keys between 3.0 and 7.0: " + bPlusTree.search(3.0, 7.0));
+            // Example search: searching for a string
+            String searchString = "exampleString";
+            System.out.println("\nSearch results for key " + searchString.hashCode() + ": " + bPlusTree.search(searchString.hashCode()));
+
+        } catch (IOException e) {
+            System.out.println("Error reading the file: " + e.getMessage());
+        }
     }
 }
+
 
