@@ -6,6 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.Scanner;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.RandomAccessFile;
 public class Bplus {
 
     static class Node implements Serializable{
@@ -55,6 +59,7 @@ private static void insertData(Node node, String key, long fileOffset) {
 }
 
 private static void add(String key, long fileOffset) {
+    key = formatKey(key);
     if (root == null) {
         Node leafNode = new Node(degree, true);
         insertData(leafNode, key, fileOffset);
@@ -134,6 +139,36 @@ private static void splitNode(Node parent, Node childNode) {
     }
 }
 
+   public static void displayIndex() {
+    if (root == null) {
+        System.out.println("B+ Tree is empty");
+        return;
+    }
+
+    System.out.println("B+ Tree Index Contents:");
+    displayIndex(root, 1);
+}
+
+// Helper method to recursively display the contents of the B+ tree index
+private static void displayIndex(Node node, int level) {
+    if (node == null) {
+        return;
+    }
+
+    System.out.print("Level: " + level + " Keys: ");
+    for (int i = 0; i < node.size; i++) {
+        System.out.print(formatKey(node.keys[i]) + " (Offset: " + node.fileOffsets[i] + ") ");
+    }
+    System.out.println();
+
+    if (!node.leaf) {
+        for (int i = 0; i <= node.size; i++) {
+            displayIndex(node.children[i], level + 1);
+        }
+    } else if (node.nextLeaf != null) {
+        displayIndex(node.nextLeaf, level);
+    }
+}
 
 
     public static void display(Node node, int level) {
@@ -376,14 +411,32 @@ private static void mergeWithLeftSibling(Node parent, int index) {
         // Update the key in the parent
         parent.keys[index] = parent.children[index].keys[0];
 }  
-      public static void writeIndexToFile(String indexFileName) {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(indexFileName))) {
+
+    public static void writeIndexToFile(String indexFileName) {
+    ObjectOutputStream outputStream = null;
+    try {
+        outputStream = new ObjectOutputStream(new FileOutputStream(indexFileName));
+        if (root != null) {
+            System.out.println("Writing B+ Tree index to file: " + indexFileName);
             writeNodeToStream(outputStream, root);
-            System.out.println("B+ Tree index written to file: " + indexFileName);
+            System.out.println("B+ Tree index written successfully.");
+        } else {
+            System.out.println("B+ Tree root is null. Cannot write index.");
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        // Close the ObjectOutputStream in a finally block to ensure it is always closed
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+}
+
 
     // Helper method to recursively write a node and its children to the stream
     private static void writeNodeToStream(ObjectOutputStream outputStream, Node node) throws IOException {
@@ -399,55 +452,159 @@ private static void mergeWithLeftSibling(Node parent, int index) {
             }
         }
     }
+//     public static void main(String[] args) {
+//     if (args.length != 1) {
+//         System.out.println("Usage: java BPlusTreeFileIndex <filename>");
+//         return;
+//     }
+
+//     String filename = args[0];
+
+//     try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+//         String line;
+//         long fileOffset = 0;
+
+//         while ((line = reader.readLine()) != null) {
+//             if (!line.isEmpty()) {
+//                 String key;
+//                 try {
+//                     key = line;
+//                     add(formatKey(String.valueOf(key)), fileOffset);
+//                     fileOffset += line.length() + 1; // +1 for newline character
+//                 } catch (NumberFormatException e) {
+//                     System.out.println("Skipping invalid line: " + line);
+//                 }
+//             }
+//         }
+//         displayIndex();
+//         // display(root, 1);
+//         String deleteKey = "yogen";
+//         System.out.println("\nDeleting Key: " + deleteKey);
+//         delete(formatKey(deleteKey));
+
+//         System.out.println("\nB+ Tree after deletion:");
+//         display(root, 1);
+        
+//         String searchKey = "yogen"; 
+//         searchKey = formatKey(searchKey);
+//         long searchResult = search(searchKey);
+//         if (searchResult != -1) {
+//             System.out.println("Key: " + searchKey + " found at offset: " + searchResult);
+//         } else {
+//             System.out.println("Key: " + searchKey + " not found");
+//         }
+
+//         String indexFileName = "BPlusTreeIndex.txt";
+//         writeIndexToFile(indexFileName);
+
+//     } catch (IOException e) {
+//         e.printStackTrace();
+//     }
+// }    
     public static void main(String[] args) {
-    if (args.length != 1) {
-        System.out.println("Usage: java BPlusTreeFileIndex <filename>");
-        return;
-    }
+        if (args.length != 1) {
+            System.out.println("Usage: java BPlusTreeFileIndex <filename>");
+            return;
+        }
 
-    String filename = args[0];
+        String filename = args[0];
 
-    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-        String line;
-        long fileOffset = 0;
+        // try (BufferedReader reader = new BufferedReader(new FileReader(filename)) ;
+        //     BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter("outputFile.txt"))){
+        //     String line;
+        //     long fileOffset = 0;
 
-        while ((line = reader.readLine()) != null) {
-            if (!line.isEmpty()) {
-                String key;
-                try {
-                    key = line;
-                    add(formatKey(String.valueOf(key)), fileOffset);
-                    fileOffset += line.length() + 1; // +1 for newline character
-                } catch (NumberFormatException e) {
-                    System.out.println("Skipping invalid line: " + line);
+        //     while ((line = reader.readLine()) != null) {
+        //         if (!line.isEmpty()) {
+        //             String key;
+        //             try {
+        //                 key = line;
+        //                 add(formatKey(String.valueOf(key)), fileOffset);
+        //                 fileOffset += line.length() + 1; // +1 for newline character
+        //             } catch (NumberFormatException e) {
+        //                 System.out.println("Skipping invalid line: " + line);
+        //             }
+        //         }
+        //     }
+            // displayIndex();
+            try (RandomAccessFile randomAccessFile = new RandomAccessFile(filename, "r")) {
+            String line;
+            // long offset = 0;
+            long offset = randomAccessFile.getFilePointer();
+
+
+            while ((line = randomAccessFile.readLine()) != null) {
+                // bPlusTree.insert(line.trim(), offset);
+                add(formatKey(line), offset);
+                offset = randomAccessFile.getFilePointer();
+            }
+            Scanner scanner = new Scanner(System.in);
+            boolean exit = false;
+
+            while (!exit) {
+                System.out.println("\nChoose an operation:");
+                // System.out.println("1. Insert");
+                System.out.println("1. Delete");
+                System.out.println("2. Search");
+                System.out.println("3. Display");
+                System.out.println("4. Exit");
+                System.out.print("Enter your choice: ");
+
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+
+                switch (choice) {
+                    // case 1:
+                    //     System.out.print("Enter the key to insert: ");
+                    //     String insertKey = scanner.nextLine();
+                    //     insertKey = formatKey(insertKey);
+                    //     long insertOffset = fileOffset;
+                    //     add(insertKey, insertOffset);
+                    //     fileOffset += insertKey.length() + 1;
+                    //     System.out.println("Key inserted successfully.");
+                    //     break;
+
+                    case 1:
+                        System.out.print("Enter the key to delete: ");
+                        String deleteKey = scanner.nextLine();
+                        deleteKey = formatKey(deleteKey);
+                        delete(deleteKey);
+                        System.out.println("Key deleted successfully.");
+                        break;
+
+                    case 2:
+                        System.out.print("Enter the key to search: ");
+                        String searchKey = scanner.nextLine();
+                        searchKey = formatKey(searchKey);
+                        long searchResult = search(searchKey);
+                        if (searchResult != -1) {
+                            System.out.println("Key: " + searchKey + " found at offset: " + searchResult);
+                        } else {
+                            System.out.println("Key: " + searchKey + " not found");
+                        }
+                        break;
+
+                    case 3:
+                        display(root, 1);
+                        break;
+
+                    case 4:
+                        exit = true;
+                        break;
+
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
                 }
             }
+
+            String indexFileName = "BPlusTreeIndex.txt";
+            writeIndexToFile(indexFileName);
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        display(root, 1);
-        String deleteKey = "yogen";
-        System.out.println("\nDeleting Key: " + deleteKey);
-        delete(formatKey(deleteKey));
-
-        System.out.println("\nB+ Tree after deletion:");
-        display(root, 1);
-        
-        String searchKey = "yogen"; 
-        searchKey = formatKey(searchKey);
-        long searchResult = search(searchKey);
-        if (searchResult != -1) {
-            System.out.println("Key: " + searchKey + " found at offset: " + searchResult);
-        } else {
-            System.out.println("Key: " + searchKey + " not found");
-        }
-
-        String indexFileName = "BPlusTreeIndex.txt";
-        writeIndexToFile(indexFileName);
-
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-}    
-    
     //Padding and truncating done here
     public static String formatKey(String key) {
         if (key.length() == KEY_LENGTH) {
