@@ -1,0 +1,5 @@
+SELECT *
+FROM large_data.csv
+WHERE Class = "II M.Tech"
+ORDER BY Reg. No ASC;
+
