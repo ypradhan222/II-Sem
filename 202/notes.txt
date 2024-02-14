@@ -1,0 +1,29 @@
+Storage layer -
+Metadata layer -
+Cache layer - Has data which is required again and again
+FE layer :
+   stateless -
+   Stateful -
+what will make front end stateless?
+In what layer will load balancer be?
+
+Netflix like system:
+1. Processing queue
+2. Encoder 
+   Converting the video format
+3. Thumbnail Generator
+   They can stored in cache layer so that they are fast. 
+4. User Information data
+5. Video metadata Storage
+
+Questions to be asked for detailed design??
+1. Is system going to read heavy or write heavy or both?
+2. Should we design a system that can retrive videos quickly?
+3. Read -write ratio
+4,5,6,7,8,9.....
+
+How will the layers can if they are both write heavy or read heavy?
+-> have two front ends
+-> 
+
+Data Sharding
