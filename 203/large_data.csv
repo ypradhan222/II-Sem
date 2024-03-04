@@ -1,51 +1,51 @@
-Name,  Class,  Reg. No,   Age
-Charlie,   I M.Sc(M),  22527,  25
-Bob,   I M.Sc(M),  55472,  23
-Bob,   II M.Tech,  37920,  27
-Charlie,   I M.Sc(M),  6456,  30
-Eva,   II M.Sc(M),  40713,  21
-Alice,   B.Sc(Hons),  45232,  24
-Charlie,   II M.Tech,  38942,  25
-Eva,   B.Sc(Hons),  71622,  25
-Bob,   I M.Sc(M),  15757,  27
-Alice,   II M.Tech,  95240,  22
-Bob,   II M.Sc(M),  20360,  23
-Eva,   II M.Tech,  4618,  29
-Alice,   I M.Sc(M),  74313,  20
-Bob,   B.Sc(Hons),  58142,  26
-Charlie,   I M.Tech,  1494,  23
-Bob,   II M.Sc(M),  77460,  28
-Bob,   B.Sc(Hons),  99320,  24
-Eva,   I M.Tech,  52162,  23
-David,   I M.Sc(M),  36005,  30
-David,   II M.Sc(M),  51999,  23
-Eva,   B.Sc(Hons),  18071,  23
-Eva,   I M.Sc(M),  1747,  24
-David,   II M.Tech,  3689,  21
-Eva,   B.Sc(Hons),  1227,  23
-David,   II M.Tech,  60860,  24
-Alice,   II M.Sc(M),  10561,  27
-Alice,   I M.Sc(M),  13744,  20
-Charlie,   II M.Tech,  19394,  20
-Alice,   I M.Tech,  55625,  29
-Eva,   II M.Sc(M),  54083,  24
-Charlie,   I M.Tech,  33673,  21
-Alice,   I M.Tech,  94422,  28
-David,   B.Sc(Hons),  2272,  25
-Eva,   B.Sc(Hons),  86846,  25
-Eva,   II M.Tech,  58926,  25
-Alice,   B.Sc(Hons),  47898,  23
-Charlie,   I M.Tech,  92801,  29
-Bob,   I M.Tech,  10694,  26
-David,   B.Sc(Hons),  34907,  25
-Eva,   I M.Tech,  21435,  23
-Eva,   I M.Tech,  57066,  29
-David,   I M.Sc(M),  89913,  22
-David,   II M.Tech,  12345,  23
-Bob,   I M.Sc(M),  79060,  23
-Eva,   I M.Sc(M),  97075,  25
-Alice,   B.Sc(Hons),  82172,  28
-Charlie,   II M.Tech,  98103,  23
-Eva,   I M.Tech,  5767,  29
-Bob,   II M.Sc(M),  33107,  26
-David,   I M.Sc(M),  82779,  25
+Name,Class,Reg. No,Age
+Charlie,I M.Sc(M),22527,  25
+Bob,I M.Sc(M),55472,  23
+Bob,II M.Tech,37920,  27
+Charlie,I M.Sc(M),6456,  30
+Eva,II M.Sc(M),40713,  21
+Alice,B.Sc(Hons),45232,  24
+Charlie,II M.Tech,38942,  25
+Eva,B.Sc(Hons),71622,  25
+Bob,I M.Sc(M),15757,  27
+Alice,II M.Tech,95240,  22
+Bob,II M.Sc(M),20360,  23
+Eva,II M.Tech,4618,  29
+Alice,I M.Sc(M),74313,  20
+Bob,B.Sc(Hons),58142,  26
+Charlie,I M.Tech,1494,  23
+Bob,II M.Sc(M),77460,  28
+Bob,B.Sc(Hons),99320,  24
+Eva,I M.Tech,52162,  23
+David,I M.Sc(M),36005,  30
+David,II M.Sc(M),51999,  23
+Eva,B.Sc(Hons),18071,  23
+Eva,I M.Sc(M),1747,  24
+David,II M.Tech,3689,  21
+Eva,B.Sc(Hons),1227,  23
+David,II M.Tech,60860,  24
+Alice,II M.Sc(M),10561,  27
+Alice,I M.Sc(M),13744,  20
+Charlie,II M.Tech,19394,  20
+Alice,I M.Tech,55625,  29
+Eva,II M.Sc(M),54083,  24
+Charlie,I M.Tech,33673,  21
+Alice,I M.Tech,94422,  28
+David,B.Sc(Hons),2272,  25
+Eva,B.Sc(Hons),86846,  25
+Eva,II M.Tech,58926,  25
+Alice,B.Sc(Hons),47898,  23
+Charlie,I M.Tech,92801,  29
+Bob,I M.Tech,10694,  26
+David,B.Sc(Hons),34907,  25
+Eva,I M.Tech,21435,  23
+Eva,I M.Tech,57066,  29
+David,I M.Sc(M),89913,  22
+David,II M.Tech,12345,  23
+Bob,I M.Sc(M),79060,  23
+Eva,I M.Sc(M),97075,  25
+Alice,B.Sc(Hons),82172,  28
+Charlie,II M.Tech,98103,  23
+Eva,I M.Tech,5767,  29
+Bob,II M.Sc(M),33107,  26
+David,I M.Sc(M),82779,  25
